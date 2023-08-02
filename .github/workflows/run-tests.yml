@@ -10,6 +10,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Setup java
+        uses: action/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
       - name: Setup gradle
         uses: gradle/gradle-build-action@v2
       - name: Run build
