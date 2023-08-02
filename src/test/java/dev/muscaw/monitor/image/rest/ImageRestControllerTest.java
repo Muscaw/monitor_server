@@ -40,12 +40,12 @@ public class ImageRestControllerTest {
   public void testGetNextUri_pathWithPageNumber() {
     UriComponentsBuilder builder = ServletUriComponentsBuilder.newInstance();
     builder =
-            builder
-                    .scheme("https")
-                    .host("some-host")
-                    .path("/monitor/images/5")
-                    .queryParam("width", 100)
-                    .queryParam("height", 120);
+        builder
+            .scheme("https")
+            .host("some-host")
+            .path("/monitor/images/5")
+            .queryParam("width", 100)
+            .queryParam("height", 120);
     URI result = this.imageRestController.getNextUri(builder, "monitor", 150, 100, new Page(5, 0));
     assertEquals("https://some-host/monitor/images/0?width=150&height=100", result.toString());
   }
