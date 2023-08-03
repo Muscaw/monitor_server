@@ -23,7 +23,6 @@ dependencies {
     implementation("org.apache.xmlgraphics:batik-svggen:1.16")
     implementation("org.apache.xmlgraphics:batik-dom:1.16")
     implementation("org.apache.xmlgraphics:batik-transcoder:1.16")
-    implementation("org.apache.xmlgraphics:batik-rasterizer:1.16")
     implementation("org.apache.xmlgraphics:batik-codec:1.16")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
