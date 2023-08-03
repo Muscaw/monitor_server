@@ -1,7 +1,10 @@
 package dev.muscaw.monitor.app.domain;
 
+import dev.muscaw.monitor.image.domain.DeviceConfiguration;
+import java.util.Optional;
+
 public interface AppService {
-  Page getPage(int pageNumber);
+  Optional<Page> getPage(int pageNumber, DeviceConfiguration deviceConfiguration);
 
   String getName();
 }

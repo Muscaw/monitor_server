@@ -28,6 +28,7 @@ dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.mockito:mockito-core:3.+")
+    testImplementation("org.hamcrest:hamcrest-library:2.2")
 }
 
 tasks.withType<Test> {
