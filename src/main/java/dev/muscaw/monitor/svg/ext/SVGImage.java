@@ -3,10 +3,15 @@ package dev.muscaw.monitor.svg.ext;
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.svggen.SVGGraphics2DIOException;
+import org.apache.batik.transcoder.TranscoderException;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.image.JPEGTranscoder;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 
 import java.awt.*;
+import java.io.IOException;
 import java.io.StringWriter;
 
 public class SVGImage {
@@ -30,5 +35,33 @@ public class SVGImage {
             throw new RuntimeException(e);
         }
         return writer.toString();
+    }
+
+    public byte[] getJpg() {
+        JPEGTranscoder transcoder = new JPEGTranscoder();
+
+        transcoder.addTranscodingHint(JPEGTranscoder.KEY_QUALITY, .8f);
+
+        TranscoderInput input = new TranscoderInput(g2.getDOMFactory());
+
+        StringWriter writer = new StringWriter();
+        TranscoderOutput output = new TranscoderOutput(writer);
+
+        try {
+            transcoder.transcode(input, output);
+        } catch (TranscoderException e) {
+            // Not a recoverable exception
+            throw new RuntimeException(e);
+        }
+
+        writer.flush();
+        try {
+            writer.close();
+        } catch (IOException e) {
+            // Not a recoverable exception as it close on a StringWriter should be a no-op
+            throw new RuntimeException(e);
+        }
+
+        return writer.toString().getBytes();
     }
 }

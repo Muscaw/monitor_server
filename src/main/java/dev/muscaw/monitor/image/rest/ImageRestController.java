@@ -8,6 +8,8 @@ import java.util.Optional;
 
 import dev.muscaw.monitor.svg.ext.WeatherSVGImage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,10 +29,10 @@ public class ImageRestController {
     }
 
     @GetMapping(value = {"/{appName}/images", "/{appName}/images/{pageNumber}"})
-    public ResponseEntity<String> getImage(
+    public ResponseEntity<ByteArrayResource> getImage(
             @RequestParam(value = "width") int width,
             @RequestParam(value = "height") int height,
-            @RequestParam(value = "svg", required = false, defaultValue = "false") boolean displaySVGOutput,
+            @RequestParam(value = "outputType", required = false, defaultValue = "svg") String outputType,
             @PathVariable(required = true) String appName,
             @PathVariable(required = false) Optional<Integer> pageNumber) {
 
@@ -42,17 +44,17 @@ public class ImageRestController {
         var builder = ServletUriComponentsBuilder.fromCurrentRequestUri();
 
         var svgImage = WeatherSVGImage.newImage(width, height);
-        String body = "";
-        String contentTypeHeader = "text/plain";
-        if(displaySVGOutput) {
-            body = svgImage.getSVGDocument();
-            contentTypeHeader = "image/svg+xml";
-        }
 
-        return ResponseEntity.ok()
-                .header("Link", "<" + getNextUri(builder, appName, width, height, page).toString() + ">")
-                .header("Content-Type", contentTypeHeader)
-                .body(body);
+        var responseBuilder = ResponseEntity.ok()
+                .header("Link", "<" + getNextUri(builder, appName, width, height, page).toString() + ">");
+
+        return switch (outputType) {
+            case "svg" ->
+                    responseBuilder.header("Content-Type", "image/svg+xml").body(new ByteArrayResource(svgImage.getSVGDocument().getBytes()));
+            case "jpg" ->
+                    responseBuilder.header("Content-Type", "image/jpeg").body(new ByteArrayResource(svgImage.getJpg()));
+            default -> responseBuilder.header("Content-Type", "text/plain").body(new ByteArrayResource("".getBytes()));
+        };
     }
 
     URI getNextUri(
