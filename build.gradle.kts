@@ -26,7 +26,7 @@ dependencies {
     implementation("org.apache.xmlgraphics:batik-codec:1.16")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.mockito:mockito-core:3.+")
+    testImplementation("org.mockito:mockito-core:5.+")
     testImplementation("org.hamcrest:hamcrest-library:2.2")
 }
 
