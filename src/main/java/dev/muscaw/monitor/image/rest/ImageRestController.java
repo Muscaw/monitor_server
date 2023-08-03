@@ -9,7 +9,6 @@ import java.util.Optional;
 import dev.muscaw.monitor.svg.ext.WeatherSVGImage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,8 +50,8 @@ public class ImageRestController {
         return switch (outputType) {
             case "svg" ->
                     responseBuilder.header("Content-Type", "image/svg+xml").body(new ByteArrayResource(svgImage.getSVGDocument().getBytes()));
-            case "jpg" ->
-                    responseBuilder.header("Content-Type", "image/jpeg").body(new ByteArrayResource(svgImage.getJpg()));
+            case "png" ->
+                    responseBuilder.header("Content-Type", "image/png").body(new ByteArrayResource(svgImage.getPng()));
             default -> responseBuilder.header("Content-Type", "text/plain").body(new ByteArrayResource("".getBytes()));
         };
     }

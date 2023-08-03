@@ -1,5 +1,6 @@
 package dev.muscaw.monitor.svg.ext;
 
+import org.apache.batik.anim.dom.SVGDOMImplementation;
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.svggen.SVGGraphics2DIOException;
@@ -7,12 +8,12 @@ import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.JPEGTranscoder;
+import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 
 import java.awt.*;
-import java.io.IOException;
-import java.io.StringWriter;
+import java.io.*;
 
 public class SVGImage {
 
@@ -20,10 +21,11 @@ public class SVGImage {
     protected SVGGraphics2D g2;
 
     protected SVGImage(int width, int height) {
-        DOMImplementation domImplementation = GenericDOMImplementation.getDOMImplementation();
+        DOMImplementation domImplementation = SVGDOMImplementation.getDOMImplementation();
         Document document = domImplementation.createDocument(SVG_NS, "svg", null);
         g2 = new SVGGraphics2D(document);
         g2.setColor(Color.BLACK);
+        g2.setSVGCanvasSize(new Dimension(width, height));
     }
 
     public String getSVGDocument() {
@@ -37,31 +39,25 @@ public class SVGImage {
         return writer.toString();
     }
 
-    public byte[] getJpg() {
-        JPEGTranscoder transcoder = new JPEGTranscoder();
-
-        transcoder.addTranscodingHint(JPEGTranscoder.KEY_QUALITY, .8f);
-
-        TranscoderInput input = new TranscoderInput(g2.getDOMFactory());
-
-        StringWriter writer = new StringWriter();
-        TranscoderOutput output = new TranscoderOutput(writer);
-
+    public byte[] getPng() {
+        StringReader reader = new StringReader(getSVGDocument());
+        PNGTranscoder transcoder = new PNGTranscoder();
+        TranscoderInput input = new TranscoderInput(reader);
+        ByteArrayOutputStream ostream = new ByteArrayOutputStream();
+        TranscoderOutput output = new TranscoderOutput(ostream);
         try {
             transcoder.transcode(input, output);
         } catch (TranscoderException e) {
-            // Not a recoverable exception
+            // Not recoverable
             throw new RuntimeException(e);
         }
-
-        writer.flush();
         try {
-            writer.close();
+            ostream.flush();
+            ostream.close();
         } catch (IOException e) {
-            // Not a recoverable exception as it close on a StringWriter should be a no-op
+            // Not recoverable
             throw new RuntimeException(e);
         }
-
-        return writer.toString().getBytes();
+        return ostream.toByteArray();
     }
 }
