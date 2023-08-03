@@ -18,12 +18,18 @@ repositories {
 }
 
 dependencies {
+    // Spring
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    // SVG support
     implementation("org.apache.xmlgraphics:batik-svggen:1.16")
     implementation("org.apache.xmlgraphics:batik-dom:1.16")
     implementation("org.apache.xmlgraphics:batik-transcoder:1.16")
     implementation("org.apache.xmlgraphics:batik-codec:1.16")
+    // HTTP queries
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-jackson:2.9.0")
+
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.mockito:mockito-core:5.+")
