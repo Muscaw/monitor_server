@@ -1,19 +1,55 @@
 package dev.muscaw.monitor.image.ext;
 
-import java.awt.*;
+import dev.muscaw.monitor.image.domain.DeviceConfiguration;
+import dev.muscaw.monitor.image.domain.Renderable;
+import dev.muscaw.monitor.weather.domain.Weather;
+import java.util.List;
 
-public class WeatherSVGImage extends SVGImage {
+public class WeatherSVGImage implements Renderable {
 
-  private WeatherSVGImage(int width, int height) {
-    super(width, height);
+  public static final int MARGIN_PX = 5;
+  private final SVGImage image;
 
-    g2.setColor(Color.BLACK);
-    g2.drawLine(0, 0, width, height);
-    g2.setBackground(Color.BLUE);
-    g2.fillRect(0, 0, width / 2, height / 2);
+  WeatherSVGImage(SVGImage image, Weather weather, DeviceConfiguration deviceConfig) {
+    this.image = image;
+
+    image.drawStringAt(MARGIN_PX, MARGIN_PX, "METEO " + weather.locationName());
+    image.drawLines(
+        MARGIN_PX,
+        MARGIN_PX + image.getStringHeight(),
+        List.of(
+            "\tC°: " + weather.temperature().temperatureC(),
+            "\tRH: " + weather.humidity().percentage(),
+            "\tUV: " + weather.uvLevel().uvLevel(),
+            "\tWind: "
+                + weather.wind().windKph()
+                + "kph (gust "
+                + weather.wind().gustKph()
+                + " kph) dir: "
+                + weather.wind().direction().direction()
+                + "("
+                + weather.wind().direction().rotation()
+                + ")"));
+    image.drawRect(0, 0, deviceConfig.width(), deviceConfig.height());
   }
 
-  public static WeatherSVGImage newImage(int width, int height) {
-    return new WeatherSVGImage(width, height);
+  public static WeatherSVGImage newImage(DeviceConfiguration deviceConfig, Weather weather) {
+    SVGImage image = SVGImage.newImage(deviceConfig.width(), deviceConfig.height());
+    return new WeatherSVGImage(image, weather, deviceConfig);
+  }
+
+  @Override
+  public String getSVGDocument() {
+    return image.getSVGDocument();
+  }
+
+  @Override
+  public byte[] getPNGImage() {
+    return image.getPNGImage();
+  }
+
+  @Override
+  public String asSerial() {
+    return image.asSerial();
   }
 }
