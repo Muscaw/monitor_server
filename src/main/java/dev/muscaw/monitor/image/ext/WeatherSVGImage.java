@@ -1,21 +1,22 @@
 package dev.muscaw.monitor.image.ext;
 
 import dev.muscaw.monitor.image.domain.DeviceConfiguration;
+import dev.muscaw.monitor.image.domain.Renderable;
 import dev.muscaw.monitor.weather.domain.Weather;
-import java.awt.Color;
 import java.util.List;
 
-public class WeatherSVGImage extends SVGImage {
+public class WeatherSVGImage implements Renderable {
 
   public static final int MARGIN_PX = 5;
+  private final SVGImage image;
 
-  private WeatherSVGImage(DeviceConfiguration deviceConfig, Weather weather) {
-    super(deviceConfig.width(), deviceConfig.height());
+  WeatherSVGImage(SVGImage image, Weather weather, DeviceConfiguration deviceConfig) {
+    this.image = image;
 
-    drawStringAt(MARGIN_PX, MARGIN_PX, "METEO " + weather.locationName());
-    drawLines(
+    image.drawStringAt(MARGIN_PX, MARGIN_PX, "METEO " + weather.locationName());
+    image.drawLines(
         MARGIN_PX,
-        MARGIN_PX + getStringHeight(),
+        MARGIN_PX + image.getStringHeight(),
         List.of(
             "\tC°: " + weather.temperature().temperatureC(),
             "\tRH: " + weather.humidity().percentage(),
@@ -29,11 +30,26 @@ public class WeatherSVGImage extends SVGImage {
                 + "("
                 + weather.wind().direction().rotation()
                 + ")"));
-    g2.setColor(Color.BLACK);
-    g2.drawRect(0, 0, deviceConfig.width(), deviceConfig.height());
+    image.drawRect(0, 0, deviceConfig.width(), deviceConfig.height());
   }
 
   public static WeatherSVGImage newImage(DeviceConfiguration deviceConfig, Weather weather) {
-    return new WeatherSVGImage(deviceConfig, weather);
+    SVGImage image = SVGImage.newImage(deviceConfig.width(), deviceConfig.height());
+    return new WeatherSVGImage(image, weather, deviceConfig);
+  }
+
+  @Override
+  public String getSVGDocument() {
+    return image.getSVGDocument();
+  }
+
+  @Override
+  public byte[] getPNGImage() {
+    return image.getPNGImage();
+  }
+
+  @Override
+  public String asSerial() {
+    return image.asSerial();
   }
 }

@@ -33,7 +33,7 @@ dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.mockito:mockito-core:5.+")
-    testImplementation("org.hamcrest:hamcrest-library:2.2")
+    testImplementation("org.assertj:assertj-core:3.24.2")
 }
 
 tasks.withType<Test> {
