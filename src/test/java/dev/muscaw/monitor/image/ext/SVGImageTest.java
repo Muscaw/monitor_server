@@ -32,6 +32,13 @@ public class SVGImageTest {
   }
 
   @Test
+  public void newImage_success() {
+    SVGImage image = SVGImage.newImage(200, 100);
+
+    assertThat(image).isNotNull();
+  }
+
+  @Test
   public void getStringHeight_success() {
     when(mockFontMetrics.getHeight()).thenReturn(10);
 

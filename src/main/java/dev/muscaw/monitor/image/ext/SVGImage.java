@@ -38,10 +38,6 @@ public final class SVGImage implements Renderable {
     g2.setColor(Color.BLACK);
   }
 
-  private void setLightColor() {
-    g2.setColor(Color.WHITE);
-  }
-
   public int getStringHeight() {
     FontMetrics metrics = g2.getFontMetrics();
     return metrics.getHeight();
