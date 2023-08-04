@@ -9,10 +9,8 @@ import dev.muscaw.monitor.image.domain.ImageSerializationException;
 import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.svggen.SVGGraphics2DIOException;
 import org.apache.batik.transcoder.TranscoderException;
@@ -118,7 +116,8 @@ public class SVGImageTest {
 
   @Test
   public void getPNGImage_success() throws Exception {
-    String svgContent = String.join("\n", Files.readAllLines(Paths.get("src/test/resources/svg/coffee.svg")));
+    String svgContent =
+        String.join("\n", Files.readAllLines(Paths.get("src/test/resources/svg/coffee.svg")));
     byte[] expectedPngContent = Files.readAllBytes(Paths.get("src/test/resources/svg/coffee.png"));
 
     doAnswer(
@@ -138,14 +137,15 @@ public class SVGImageTest {
   public void getPNGImage_transcoderFailure() throws Exception {
 
     doAnswer(
-            i -> {
-              i.getArgument(0, StringWriter.class).write("some-bad-content");
-              return null;
-            })
-            .when(mockG2)
-            .stream(any(StringWriter.class));
+        i -> {
+          i.getArgument(0, StringWriter.class).write("some-bad-content");
+          return null;
+        })
+        .when(mockG2)
+        .stream(any(StringWriter.class));
 
-    ImageSerializationException ex = assertThrows(ImageSerializationException.class, () -> svgImage.getPNGImage());
+    ImageSerializationException ex =
+        assertThrows(ImageSerializationException.class, () -> svgImage.getPNGImage());
 
     assertThat(ex).hasCauseInstanceOf(TranscoderException.class);
   }
