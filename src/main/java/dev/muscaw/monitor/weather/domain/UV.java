@@ -1,3 +1,3 @@
 package dev.muscaw.monitor.weather.domain;
 
-public record UV(int uvLevel) {}
+public record UV(float uvLevel) {}

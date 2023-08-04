@@ -1,3 +1,3 @@
 package dev.muscaw.monitor.weather.domain;
 
-public record RelativeHumidity(float percentage) {}
+public record RelativeHumidity(int percentage) {}

@@ -1,8 +1,11 @@
 package dev.muscaw.monitor.image.ext;
 
 import dev.muscaw.monitor.image.domain.Renderable;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.io.*;
+import java.util.List;
 import org.apache.batik.anim.dom.SVGDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.svggen.SVGGraphics2DIOException;
@@ -57,6 +60,37 @@ public class SVGImage implements Renderable {
       throw new RuntimeException(e);
     }
     return ostream.toByteArray();
+  }
+
+  protected int getStringHeight() {
+    FontMetrics metrics = g2.getFontMetrics();
+    return metrics.getHeight();
+  }
+
+  protected int getStringWidth(String value) {
+    FontMetrics metrics = g2.getFontMetrics();
+    return metrics.stringWidth(value);
+  }
+
+  protected void drawStringCentered(int x, int y, String value) {
+    int width = getStringWidth(value);
+
+    drawStringAt(x - (width / 2), y, value);
+  }
+
+  protected void drawStringAt(int x, int y, String value) {
+    int height = getStringHeight();
+
+    g2.drawString(value, x, y + (height / 2));
+  }
+
+  protected void drawLines(int x, int y, List<String> lines) {
+    int height = getStringHeight();
+    int currentY = y;
+    for (String line : lines) {
+      drawStringAt(x, currentY, line);
+      currentY += height;
+    }
   }
 
   public String asSerial() {

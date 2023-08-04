@@ -15,7 +15,7 @@ public class MonitorAppServiceImpl implements AppService {
 
   public final String NAME = "monitor";
 
-  private WeatherService weatherService;
+  private final WeatherService weatherService;
 
   @Autowired
   public MonitorAppServiceImpl(WeatherService weatherService) {
@@ -24,12 +24,12 @@ public class MonitorAppServiceImpl implements AppService {
 
   @Override
   public Optional<Page> getPage(int pageNumber, DeviceConfiguration deviceConfiguration) {
-    weatherService.getCurrentWeather(new LatLon(46.62f, 7.07f));
+    var weather = weatherService.getCurrentWeather(new LatLon(46.62f, 7.07f));
     return Optional.of(
         new Page(
             pageNumber,
             nextPage(pageNumber),
-            WeatherSVGImage.newImage(deviceConfiguration.width(), deviceConfiguration.height())));
+            WeatherSVGImage.newImage(deviceConfiguration, weather)));
   }
 
   @Override
