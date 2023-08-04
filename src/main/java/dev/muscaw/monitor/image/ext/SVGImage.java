@@ -3,14 +3,20 @@ package dev.muscaw.monitor.image.ext;
 import dev.muscaw.monitor.image.domain.ImageSerializationException;
 import dev.muscaw.monitor.image.domain.Renderable;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import javax.imageio.ImageIO;
+
 import org.apache.batik.anim.dom.SVGDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.svggen.SVGGraphics2DIOException;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.image.ImageTranscoder;
 import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
@@ -19,9 +25,13 @@ public final class SVGImage implements Renderable {
 
   private static final String SVG_NS = "http://www.w3.org/2000/svg";
   private SVGGraphics2D g2;
+  private int width;
+  private int height;
 
-  SVGImage(SVGGraphics2D g2) {
+  SVGImage(SVGGraphics2D g2, int width, int height) {
     this.g2 = g2;
+    this.width = width;
+    this.height = height;
   }
 
   public static SVGImage newImage(int width, int height) {
@@ -31,7 +41,7 @@ public final class SVGImage implements Renderable {
     g2.setColor(Color.BLACK);
     g2.setSVGCanvasSize(new Dimension(width, height));
 
-    return new SVGImage(g2);
+    return new SVGImage(g2, width, height);
   }
 
   private void setDarkColor() {
@@ -76,7 +86,22 @@ public final class SVGImage implements Renderable {
 
   // Exporter functions
   public String asSerial() {
-    return "bwbwwwbbb";
+    byte[] pngImage = getPNGImage();
+    BufferedImage image;
+    try {
+      image = ImageIO.read(new ByteArrayInputStream(pngImage));
+    } catch (IOException e) {
+      // Not a recoverable error. Should not be thrown as everything happens in memory
+      throw new RuntimeException(e);
+    }
+    StringBuilder serializedImage = new StringBuilder();
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        int color = image.getRGB(x, y);
+        serializedImage.append((color & 0x00FFFFFF) == 0xFFFFFF ? "w" : "b");
+      }
+    }
+    return serializedImage.toString();
   }
 
   public String getSVGDocument() {
@@ -93,6 +118,7 @@ public final class SVGImage implements Renderable {
   public byte[] getPNGImage() {
     StringReader reader = new StringReader(getSVGDocument());
     PNGTranscoder transcoder = new PNGTranscoder();
+    transcoder.addTranscodingHint(ImageTranscoder.KEY_BACKGROUND_COLOR, Color.WHITE);
     TranscoderInput input = new TranscoderInput(reader);
     ByteArrayOutputStream ostream = new ByteArrayOutputStream();
     TranscoderOutput output = new TranscoderOutput(ostream);
