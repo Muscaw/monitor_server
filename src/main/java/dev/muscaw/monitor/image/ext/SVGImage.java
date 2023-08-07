@@ -81,6 +81,21 @@ public final class SVGImage implements Renderable {
     g2.drawRect(x, y, width, height);
   }
 
+  private int colorToGrayscale(int color) {
+    int red = color & 0x00FF0000 >> 16;
+    int green = color & 0x0000FF00 >> 8;
+    int blue = color & 0x000000FF;
+
+    int average = (red + green + blue) / 3;
+    return red << 16 | green << 8 | blue;
+  }
+
+  private String grayscaleToBlackWhite(int grayscale) {
+    // Returns black if color is less than the middle of the color space (tends to black).
+    // Otherwise return white
+    return (grayscale & 0x00FFFFFF) < 0x8F8F8F ? "b" : "w";
+  }
+
   // Exporter functions
   public String asSerial() {
     byte[] pngImage = getPNGImage();
@@ -95,7 +110,8 @@ public final class SVGImage implements Renderable {
     for (int y = 0; y < height; y++) {
       for (int x = 0; x < width; x++) {
         int color = image.getRGB(x, y);
-        serializedImage.append((color & 0x00FFFFFF) == 0xFFFFFF ? "w" : "b");
+        String colorChar = grayscaleToBlackWhite(colorToGrayscale(color));
+        serializedImage.append(colorChar);
       }
     }
     return serializedImage.toString();
