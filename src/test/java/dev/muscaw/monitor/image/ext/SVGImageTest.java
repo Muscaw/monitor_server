@@ -6,11 +6,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import dev.muscaw.monitor.image.domain.ImageSerializationException;
+
 import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.util.Optional;
+
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.svggen.SVGGraphics2DIOException;
 import org.apache.batik.transcoder.TranscoderException;
@@ -19,141 +24,155 @@ import org.junit.jupiter.api.Test;
 
 public class SVGImageTest {
 
-  private SVGImage svgImage;
-  private SVGGraphics2D mockG2;
-  private FontMetrics mockFontMetrics;
+    public static final int SCREEN_WIDTH = 296;
+    public static final int SCREEN_HEIGHT = 128;
 
-  @BeforeEach
-  public void setUp() {
-    mockG2 = mock(SVGGraphics2D.class);
-    svgImage = new SVGImage(mockG2);
-    mockFontMetrics = mock(FontMetrics.class);
-    when(mockG2.getFontMetrics()).thenReturn(mockFontMetrics);
-  }
+    private SVGImage svgImage;
+    private SVGGraphics2D mockG2;
+    private FontMetrics mockFontMetrics;
 
-  @Test
-  public void newImage_success() {
-    SVGImage image = SVGImage.newImage(200, 100);
+    @BeforeEach
+    public void setUp() {
+        mockG2 = mock(SVGGraphics2D.class);
+        svgImage = new SVGImage(mockG2, SCREEN_WIDTH, SCREEN_HEIGHT);
+        mockFontMetrics = mock(FontMetrics.class);
+        when(mockG2.getFontMetrics()).thenReturn(mockFontMetrics);
+    }
 
-    assertThat(image).isNotNull();
-  }
+    @Test
+    public void newImage_success() {
+        SVGImage image = SVGImage.newImage(200, 100);
 
-  @Test
-  public void getStringHeight_success() {
-    when(mockFontMetrics.getHeight()).thenReturn(10);
+        assertThat(image).isNotNull();
+    }
 
-    int result = svgImage.getStringHeight();
-    assertEquals(10, result);
-  }
+    @Test
+    public void getStringHeight_success() {
+        when(mockFontMetrics.getHeight()).thenReturn(10);
 
-  @Test
-  public void getStringWidth_success() {
-    when(mockFontMetrics.stringWidth("some-string")).thenReturn(10);
+        int result = svgImage.getStringHeight();
+        assertEquals(10, result);
+    }
 
-    int result = svgImage.getStringWidth("some-string");
-    assertEquals(10, result);
-  }
+    @Test
+    public void getStringWidth_success() {
+        when(mockFontMetrics.stringWidth("some-string")).thenReturn(10);
 
-  @Test
-  public void drawStringCentered_success() {
-    when(mockFontMetrics.getHeight()).thenReturn(10);
-    when(mockFontMetrics.stringWidth("centered-string")).thenReturn(20);
+        int result = svgImage.getStringWidth("some-string");
+        assertEquals(10, result);
+    }
 
-    svgImage.drawStringCentered(10, 5, "centered-string");
+    @Test
+    public void drawStringCentered_success() {
+        when(mockFontMetrics.getHeight()).thenReturn(10);
+        when(mockFontMetrics.stringWidth("centered-string")).thenReturn(20);
 
-    verify(mockG2).drawString("centered-string", 0, 10);
-  }
+        svgImage.drawStringCentered(10, 5, "centered-string");
 
-  @Test
-  public void drawStringAt_success() {
-    when(mockFontMetrics.getHeight()).thenReturn(10);
+        verify(mockG2).drawString("centered-string", 0, 10);
+    }
 
-    svgImage.drawStringAt(10, 20, "some-string");
+    @Test
+    public void drawStringAt_success() {
+        when(mockFontMetrics.getHeight()).thenReturn(10);
 
-    verify(mockG2).drawString("some-string", 10, 25);
-  }
+        svgImage.drawStringAt(10, 20, "some-string");
 
-  @Test
-  public void drawLines_success() {
-    when(mockFontMetrics.getHeight()).thenReturn(10);
+        verify(mockG2).drawString("some-string", 10, 25);
+    }
 
-    svgImage.drawLines(0, 0, List.of("string1", "string2", "string3"));
+    @Test
+    public void drawLines_success() {
+        when(mockFontMetrics.getHeight()).thenReturn(10);
 
-    verify(mockG2).drawString("string1", 0, 5);
-    verify(mockG2).drawString("string2", 0, 15);
-    verify(mockG2).drawString("string3", 0, 25);
-  }
+        svgImage.drawLines(0, 0, List.of("string1", "string2", "string3"));
 
-  @Test
-  public void drawRect_success() {
-    svgImage.drawRect(0, 0, 100, 200);
+        verify(mockG2).drawString("string1", 0, 5);
+        verify(mockG2).drawString("string2", 0, 15);
+        verify(mockG2).drawString("string3", 0, 25);
+    }
 
-    verify(mockG2).setColor(Color.BLACK);
-    verify(mockG2).drawRect(0, 0, 100, 200);
-  }
+    @Test
+    public void drawRect_success() {
+        svgImage.drawRect(0, 0, 100, 200);
 
-  @Test
-  public void asSerial_success() {
-    String result = svgImage.asSerial();
+        verify(mockG2).setColor(Color.BLACK);
+        verify(mockG2).drawRect(0, 0, 100, 200);
+    }
 
-    assertEquals("bwbwwwbbb", result);
-  }
+    @Test
+    public void asSerial_success() throws Exception {
+        String svgContent =
+                String.join("\n", Files.readAllLines(Paths.get("src/test/resources/svg/coffee.svg")));
+        byte[] expectedBinaryContent = Files.readAllBytes(Paths.get("src/test/resources/svg/coffee.bin"));
 
-  @Test
-  public void getSVGDocument_success() throws Exception {
-    doAnswer(
-        i -> {
-          i.getArgument(0, StringWriter.class).write("<svg>a-document</svg>");
-          return null;
-        })
-        .when(mockG2)
-        .stream(any(StringWriter.class));
+        doAnswer(
+                i -> {
+                    i.getArgument(0, StringWriter.class).write(svgContent);
+                    return null;
+                })
+                .when(mockG2)
+                .stream(any(StringWriter.class));
+        byte[] result = svgImage.asSerial();
 
-    String result = svgImage.getSVGDocument();
+        assertThat(result).isEqualTo(expectedBinaryContent);
+    }
 
-    assertThat(result).isEqualTo("<svg>a-document</svg>");
-  }
+    @Test
+    public void getSVGDocument_success() throws Exception {
+        doAnswer(
+                i -> {
+                    i.getArgument(0, StringWriter.class).write("<svg>a-document</svg>");
+                    return null;
+                })
+                .when(mockG2)
+                .stream(any(StringWriter.class));
 
-  @Test
-  public void getSVGDocument_dioError() throws Exception {
-    doThrow(SVGGraphics2DIOException.class).when(mockG2).stream(any(StringWriter.class));
+        String result = svgImage.getSVGDocument();
 
-    assertThrows(ImageSerializationException.class, () -> svgImage.getSVGDocument());
-  }
+        assertThat(result).isEqualTo("<svg>a-document</svg>");
+    }
 
-  @Test
-  public void getPNGImage_success() throws Exception {
-    String svgContent =
-        String.join("\n", Files.readAllLines(Paths.get("src/test/resources/svg/coffee.svg")));
-    byte[] expectedPngContent = Files.readAllBytes(Paths.get("src/test/resources/svg/coffee.png"));
+    @Test
+    public void getSVGDocument_dioError() throws Exception {
+        doThrow(SVGGraphics2DIOException.class).when(mockG2).stream(any(StringWriter.class));
 
-    doAnswer(
-        i -> {
-          i.getArgument(0, StringWriter.class).write(svgContent);
-          return null;
-        })
-        .when(mockG2)
-        .stream(any(StringWriter.class));
+        assertThrows(ImageSerializationException.class, () -> svgImage.getSVGDocument());
+    }
 
-    byte[] result = svgImage.getPNGImage();
+    @Test
+    public void getPNGImage_success() throws Exception {
+        String svgContent =
+                String.join("\n", Files.readAllLines(Paths.get("src/test/resources/svg/coffee.svg")));
+        byte[] expectedPngContent = Files.readAllBytes(Paths.get("src/test/resources/svg/coffee.png"));
 
-    assertThat(result).isEqualTo(expectedPngContent);
-  }
+        doAnswer(
+                i -> {
+                    i.getArgument(0, StringWriter.class).write(svgContent);
+                    return null;
+                })
+                .when(mockG2)
+                .stream(any(StringWriter.class));
 
-  @Test
-  public void getPNGImage_transcoderFailure() throws Exception {
+        byte[] result = svgImage.getPNGImage();
 
-    doAnswer(
-        i -> {
-          i.getArgument(0, StringWriter.class).write("some-bad-content");
-          return null;
-        })
-        .when(mockG2)
-        .stream(any(StringWriter.class));
+        assertThat(result).isEqualTo(expectedPngContent);
+    }
 
-    ImageSerializationException ex =
-        assertThrows(ImageSerializationException.class, () -> svgImage.getPNGImage());
+    @Test
+    public void getPNGImage_transcoderFailure() throws Exception {
 
-    assertThat(ex).hasCauseInstanceOf(TranscoderException.class);
-  }
+        doAnswer(
+                i -> {
+                    i.getArgument(0, StringWriter.class).write("some-bad-content");
+                    return null;
+                })
+                .when(mockG2)
+                .stream(any(StringWriter.class));
+
+        ImageSerializationException ex =
+                assertThrows(ImageSerializationException.class, () -> svgImage.getPNGImage());
+
+        assertThat(ex).hasCauseInstanceOf(TranscoderException.class);
+    }
 }
