@@ -61,8 +61,8 @@ public class ImageRestController {
           .header("Content-Type", "image/png")
           .body(new ByteArrayResource(image.getPNGImage()));
       default -> responseBuilder
-          .header("Content-Type", "text/plain")
-          .body(new ByteArrayResource(image.asSerial().getBytes()));
+          .header("Content-Type", "application/octet-stream")
+          .body(new ByteArrayResource(image.asSerial()));
     };
   }
 

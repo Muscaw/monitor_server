@@ -5,6 +5,7 @@ import dev.muscaw.monitor.image.domain.Renderable;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
 import org.apache.batik.anim.dom.SVGDOMImplementation;
@@ -81,13 +82,13 @@ public final class SVGImage implements Renderable {
     g2.drawRect(x, y, width, height);
   }
 
-  private int colorToGrayscale(int color) {
+  private byte colorToGrayscaleByte(int color) {
     int red = color & 0x00FF0000 >> 16;
     int green = color & 0x0000FF00 >> 8;
     int blue = color & 0x000000FF;
 
     int average = (red + green + blue) / 3;
-    return red << 16 | green << 8 | blue;
+    return (byte) average;
   }
 
   private String grayscaleToBlackWhite(int grayscale) {
@@ -97,7 +98,7 @@ public final class SVGImage implements Renderable {
   }
 
   // Exporter functions
-  public String asSerial() {
+  public byte[] asSerial() {
     byte[] pngImage = getPNGImage();
     BufferedImage image;
     try {
@@ -106,15 +107,15 @@ public final class SVGImage implements Renderable {
       // Not a recoverable error. Should not be thrown as everything happens in memory
       throw new RuntimeException(e);
     }
-    StringBuilder serializedImage = new StringBuilder();
+    byte[] serializedImage = new byte[width * height];
     for (int y = 0; y < height; y++) {
       for (int x = 0; x < width; x++) {
         int color = image.getRGB(x, y);
-        String colorChar = grayscaleToBlackWhite(colorToGrayscale(color));
-        serializedImage.append(colorChar);
+        byte grayscaleColor = colorToGrayscaleByte(color);
+        serializedImage[y*width + x] = grayscaleColor;
       }
     }
-    return serializedImage.toString();
+    return serializedImage;
   }
 
   public String getSVGDocument() {

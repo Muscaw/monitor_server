@@ -49,7 +49,7 @@ public class WeatherSVGImage implements Renderable {
   }
 
   @Override
-  public String asSerial() {
+  public byte[] asSerial() {
     return image.asSerial();
   }
 }
