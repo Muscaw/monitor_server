@@ -5,11 +5,8 @@ import dev.muscaw.monitor.image.domain.Renderable;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import javax.imageio.ImageIO;
-
 import org.apache.batik.anim.dom.SVGDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.svggen.SVGGraphics2DIOException;
