@@ -30,7 +30,7 @@ public class WeatherSVGImage implements Renderable {
                 + "("
                 + weather.wind().direction().rotation()
                 + ")"));
-    image.drawRect(0, 0, deviceConfig.width(), deviceConfig.height());
+    image.drawRect(0, 0, deviceConfig.width() - 1, deviceConfig.height() - 1);
   }
 
   public static WeatherSVGImage newImage(DeviceConfiguration deviceConfig, Weather weather) {
@@ -49,7 +49,7 @@ public class WeatherSVGImage implements Renderable {
   }
 
   @Override
-  public String asSerial() {
+  public byte[] asSerial() {
     return image.asSerial();
   }
 }

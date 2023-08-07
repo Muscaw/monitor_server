@@ -67,7 +67,7 @@ public class ImageRestControllerTest {
     var mockAppService = mock(AppService.class);
     var mockRenderable = mock(Renderable.class);
 
-    when(mockRenderable.asSerial()).thenReturn("wbbw");
+    when(mockRenderable.asSerial()).thenReturn(new byte[] {0, 1, 2, 3});
     when(mockAppService.getPage(0, new DeviceConfiguration(150, 100)))
         .thenReturn(Optional.of(new Page(0, 1, mockRenderable)));
 
@@ -78,8 +78,8 @@ public class ImageRestControllerTest {
         .andExpect(status().isOk())
         .andExpect(
             header().string("Link", "<http://localhost/monitor/images/1?width=150&height=100>"))
-        .andExpect(content().contentType("text/plain"))
-        .andExpect(content().string("wbbw"));
+        .andExpect(content().contentType("application/octet-stream"))
+        .andExpect(content().bytes(new byte[] {0, 1, 2, 3}));
   }
 
   @Test

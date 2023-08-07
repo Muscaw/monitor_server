@@ -19,6 +19,9 @@ import org.junit.jupiter.api.Test;
 
 public class SVGImageTest {
 
+  public static final int SCREEN_WIDTH = 296;
+  public static final int SCREEN_HEIGHT = 128;
+
   private SVGImage svgImage;
   private SVGGraphics2D mockG2;
   private FontMetrics mockFontMetrics;
@@ -26,7 +29,7 @@ public class SVGImageTest {
   @BeforeEach
   public void setUp() {
     mockG2 = mock(SVGGraphics2D.class);
-    svgImage = new SVGImage(mockG2);
+    svgImage = new SVGImage(mockG2, SCREEN_WIDTH, SCREEN_HEIGHT);
     mockFontMetrics = mock(FontMetrics.class);
     when(mockG2.getFontMetrics()).thenReturn(mockFontMetrics);
   }
@@ -93,10 +96,22 @@ public class SVGImageTest {
   }
 
   @Test
-  public void asSerial_success() {
-    String result = svgImage.asSerial();
+  public void asSerial_success() throws Exception {
+    String svgContent =
+        String.join("\n", Files.readAllLines(Paths.get("src/test/resources/svg/coffee.svg")));
+    byte[] expectedBinaryContent =
+        Files.readAllBytes(Paths.get("src/test/resources/svg/coffee.bin"));
 
-    assertEquals("bwbwwwbbb", result);
+    doAnswer(
+        i -> {
+          i.getArgument(0, StringWriter.class).write(svgContent);
+          return null;
+        })
+        .when(mockG2)
+        .stream(any(StringWriter.class));
+    byte[] result = svgImage.asSerial();
+
+    assertThat(result).isEqualTo(expectedBinaryContent);
   }
 
   @Test
