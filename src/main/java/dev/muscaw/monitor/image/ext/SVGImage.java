@@ -5,7 +5,6 @@ import dev.muscaw.monitor.image.domain.Renderable;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
 import org.apache.batik.anim.dom.SVGDOMImplementation;
@@ -112,7 +111,7 @@ public final class SVGImage implements Renderable {
       for (int x = 0; x < width; x++) {
         int color = image.getRGB(x, y);
         byte grayscaleColor = colorToGrayscaleByte(color);
-        serializedImage[y*width + x] = grayscaleColor;
+        serializedImage[y * width + x] = grayscaleColor;
       }
     }
     return serializedImage;
