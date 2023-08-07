@@ -25,6 +25,7 @@ public class SVGImageTest {
   private SVGImage svgImage;
   private SVGGraphics2D mockG2;
   private FontMetrics mockFontMetrics;
+  private Font font;
 
   @BeforeEach
   public void setUp() {
@@ -32,11 +33,12 @@ public class SVGImageTest {
     svgImage = new SVGImage(mockG2, SCREEN_WIDTH, SCREEN_HEIGHT);
     mockFontMetrics = mock(FontMetrics.class);
     when(mockG2.getFontMetrics()).thenReturn(mockFontMetrics);
+    font = new Font(Font.SERIF, Font.BOLD, 10);
   }
 
   @Test
   public void newImage_success() {
-    SVGImage image = SVGImage.newImage(200, 100);
+    SVGImage image = SVGImage.newImage(200, 100, font);
 
     assertThat(image).isNotNull();
   }

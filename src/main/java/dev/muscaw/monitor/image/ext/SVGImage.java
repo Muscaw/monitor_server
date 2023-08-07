@@ -31,12 +31,13 @@ public final class SVGImage implements Renderable {
     this.height = height;
   }
 
-  public static SVGImage newImage(int width, int height) {
+  public static SVGImage newImage(int width, int height, Font font) {
     DOMImplementation domImplementation = SVGDOMImplementation.getDOMImplementation();
     Document document = domImplementation.createDocument(SVG_NS, "svg", null);
     SVGGraphics2D g2 = new SVGGraphics2D(document);
     g2.setColor(Color.BLACK);
     g2.setSVGCanvasSize(new Dimension(width, height));
+    g2.setFont(font);
 
     return new SVGImage(g2, width, height);
   }
