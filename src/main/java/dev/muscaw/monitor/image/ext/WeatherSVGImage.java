@@ -1,8 +1,10 @@
 package dev.muscaw.monitor.image.ext;
 
 import dev.muscaw.monitor.image.domain.DeviceConfiguration;
+import dev.muscaw.monitor.image.domain.RenderType;
 import dev.muscaw.monitor.image.domain.Renderable;
 import dev.muscaw.monitor.weather.domain.Weather;
+import java.awt.*;
 import java.util.List;
 
 public class WeatherSVGImage implements Renderable {
@@ -33,8 +35,9 @@ public class WeatherSVGImage implements Renderable {
     image.drawRect(0, 0, deviceConfig.width() - 1, deviceConfig.height() - 1);
   }
 
-  public static WeatherSVGImage newImage(DeviceConfiguration deviceConfig, Weather weather) {
-    SVGImage image = SVGImage.newImage(deviceConfig.width(), deviceConfig.height());
+  public static WeatherSVGImage newImage(
+      DeviceConfiguration deviceConfig, Weather weather, FontGroup font) {
+    SVGImage image = SVGImage.newImage(deviceConfig.width(), deviceConfig.height(), font);
     return new WeatherSVGImage(image, weather, deviceConfig);
   }
 
@@ -49,7 +52,7 @@ public class WeatherSVGImage implements Renderable {
   }
 
   @Override
-  public byte[] asSerial() {
-    return image.asSerial();
+  public byte[] asSerial(RenderType renderType) {
+    return image.asSerial(renderType);
   }
 }

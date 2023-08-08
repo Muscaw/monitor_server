@@ -3,15 +3,13 @@ package dev.muscaw.monitor.image.rest;
 import dev.muscaw.monitor.app.domain.AppSelector;
 import dev.muscaw.monitor.app.domain.Page;
 import dev.muscaw.monitor.image.domain.DeviceConfiguration;
+import dev.muscaw.monitor.image.domain.RenderType;
 import java.net.URI;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -27,12 +25,16 @@ public class ImageRestController {
 
   @GetMapping(value = {"/{appName}/images", "/{appName}/images/{pageNumber}"})
   public ResponseEntity<ByteArrayResource> getImage(
-      @RequestParam(value = "width") int width,
-      @RequestParam(value = "height") int height,
+      @RequestParam(value = "renderType", required = false, defaultValue = "bw")
+          String renderTypeHeader,
+      @RequestParam("width") int width,
+      @RequestParam("height") int height,
       @RequestParam(value = "outputType", required = false, defaultValue = "text")
           String outputType,
       @PathVariable String appName,
       @PathVariable(required = false) Optional<Integer> pageNumber) {
+
+    var renderType = RenderType.fromString(renderTypeHeader, RenderType.BW);
 
     var app = appSelector.selectApp(appName);
     var deviceConfig = new DeviceConfiguration(width, height);
@@ -62,7 +64,7 @@ public class ImageRestController {
           .body(new ByteArrayResource(image.getPNGImage()));
       default -> responseBuilder
           .header("Content-Type", "application/octet-stream")
-          .body(new ByteArrayResource(image.asSerial()));
+          .body(new ByteArrayResource(image.asSerial(renderType)));
     };
   }
 

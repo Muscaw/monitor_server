@@ -3,7 +3,8 @@ package dev.muscaw.monitor.app.service;
 import dev.muscaw.monitor.app.domain.AppService;
 import dev.muscaw.monitor.app.domain.Page;
 import dev.muscaw.monitor.image.domain.DeviceConfiguration;
-import dev.muscaw.monitor.image.ext.WeatherSVGImage;
+import dev.muscaw.monitor.image.domain.ImageGeneratorService;
+import dev.muscaw.monitor.image.domain.WeatherOption;
 import dev.muscaw.monitor.util.domain.LatLon;
 import dev.muscaw.monitor.weather.domain.WeatherService;
 import java.util.Optional;
@@ -16,10 +17,13 @@ public class MonitorAppServiceImpl implements AppService {
   public final String NAME = "monitor";
 
   private final WeatherService weatherService;
+  private final ImageGeneratorService imageGeneratorService;
 
   @Autowired
-  public MonitorAppServiceImpl(WeatherService weatherService) {
+  public MonitorAppServiceImpl(
+      WeatherService weatherService, ImageGeneratorService imageGeneratorService) {
     this.weatherService = weatherService;
+    this.imageGeneratorService = imageGeneratorService;
   }
 
   @Override
@@ -29,7 +33,7 @@ public class MonitorAppServiceImpl implements AppService {
         new Page(
             pageNumber,
             nextPage(pageNumber),
-            WeatherSVGImage.newImage(deviceConfiguration, weather)));
+            imageGeneratorService.generateImage(new WeatherOption(deviceConfiguration, weather))));
   }
 
   @Override

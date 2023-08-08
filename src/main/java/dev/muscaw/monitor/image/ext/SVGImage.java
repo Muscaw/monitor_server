@@ -1,6 +1,7 @@
 package dev.muscaw.monitor.image.ext;
 
 import dev.muscaw.monitor.image.domain.ImageSerializationException;
+import dev.muscaw.monitor.image.domain.RenderType;
 import dev.muscaw.monitor.image.domain.Renderable;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -24,6 +25,7 @@ public final class SVGImage implements Renderable {
   private SVGGraphics2D g2;
   private int width;
   private int height;
+  private static final int BRIGHTNESS_CUTOFF_LEVEL = 0x01;
 
   SVGImage(SVGGraphics2D g2, int width, int height) {
     this.g2 = g2;
@@ -31,13 +33,15 @@ public final class SVGImage implements Renderable {
     this.height = height;
   }
 
-  public static SVGImage newImage(int width, int height) {
+  public static SVGImage newImage(int width, int height, FontGroup font) {
     DOMImplementation domImplementation = SVGDOMImplementation.getDOMImplementation();
     Document document = domImplementation.createDocument(SVG_NS, "svg", null);
     SVGGraphics2D g2 = new SVGGraphics2D(document);
     g2.setColor(Color.BLACK);
     g2.setSVGCanvasSize(new Dimension(width, height));
-
+    g2.setFont(font.generateFont(Font.PLAIN, 20));
+    g2.setRenderingHint(
+        RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
     return new SVGImage(g2, width, height);
   }
 
@@ -81,7 +85,7 @@ public final class SVGImage implements Renderable {
     g2.drawRect(x, y, width, height);
   }
 
-  private byte colorToGrayscaleByte(int color) {
+  private int colorToGrayscaleByte(int color) {
     int red = color & 0x00FF0000 >> 16;
     int green = color & 0x0000FF00 >> 8;
     int blue = color & 0x000000FF;
@@ -90,14 +94,14 @@ public final class SVGImage implements Renderable {
     return (byte) average;
   }
 
-  private String grayscaleToBlackWhite(int grayscale) {
+  private int grayscaleToBlackWhite(int grayscale) {
     // Returns black if color is less than the middle of the color space (tends to black).
     // Otherwise return white
-    return (grayscale & 0x00FFFFFF) < 0x8F8F8F ? "b" : "w";
+    return (grayscale & 0xFF) < BRIGHTNESS_CUTOFF_LEVEL ? 0 : 0xFF;
   }
 
   // Exporter functions
-  public byte[] asSerial() {
+  public byte[] asSerial(RenderType renderType) {
     byte[] pngImage = getPNGImage();
     BufferedImage image;
     try {
@@ -110,8 +114,11 @@ public final class SVGImage implements Renderable {
     for (int y = 0; y < height; y++) {
       for (int x = 0; x < width; x++) {
         int color = image.getRGB(x, y);
-        byte grayscaleColor = colorToGrayscaleByte(color);
-        serializedImage[y * width + x] = grayscaleColor;
+        int finalBrightness = colorToGrayscaleByte(color);
+        if (renderType == RenderType.BW) {
+          finalBrightness = grayscaleToBlackWhite(finalBrightness);
+        }
+        serializedImage[y * width + x] = (byte) finalBrightness;
       }
     }
     return serializedImage;
