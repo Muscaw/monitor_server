@@ -6,7 +6,7 @@ public enum RenderType {
 
   public static RenderType fromString(String value, RenderType defaultValue) {
     try {
-      return RenderType.valueOf(value);
+      return RenderType.valueOf(value.toUpperCase());
     } catch (IllegalArgumentException ex) {
       // Not a valid value
       return defaultValue;

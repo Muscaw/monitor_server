@@ -4,7 +4,7 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public record FontGroup(Font base) {
+public record FontGroup(Font base, GraphicsEnvironment ge) {
   record FontStyle(int style, float size) {}
 
   private static final Map<FontStyle, Font> fonts = new HashMap<>();
@@ -20,7 +20,6 @@ public record FontGroup(Font base) {
   }
 
   private void registerFont(Font font) {
-    GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
     ge.registerFont(font);
   }
 }

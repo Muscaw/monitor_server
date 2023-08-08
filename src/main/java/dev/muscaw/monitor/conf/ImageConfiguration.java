@@ -13,7 +13,8 @@ public class ImageConfiguration {
   public FontGroup getImageFont() throws IOException, FontFormatException {
     var font =
         Font.createFont(
-            Font.TRUETYPE_FONT, Paths.get("src/main/resources/font/pixeloid/PixeloidSans-mLxMm.ttf").toFile());
-    return new FontGroup(font);
+            Font.TRUETYPE_FONT,
+            Paths.get("src/main/resources/font/pixeloid/PixeloidSans-mLxMm.ttf").toFile());
+    return new FontGroup(font, GraphicsEnvironment.getLocalGraphicsEnvironment());
   }
 }
