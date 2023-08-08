@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ImageGeneratorVisitorImpl implements ImageGeneratorVisitor {
-  private final Font imageFont;
+  private final FontGroup imageFont;
 
   @Autowired
-  public ImageGeneratorVisitorImpl(Font imageFont) {
+  public ImageGeneratorVisitorImpl(FontGroup imageFont) {
     this.imageFont = imageFont;
   }
 

@@ -11,6 +11,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+
+import dev.muscaw.monitor.image.domain.RenderType;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.svggen.SVGGraphics2DIOException;
 import org.apache.batik.transcoder.TranscoderException;
@@ -25,7 +27,7 @@ public class SVGImageTest {
   private SVGImage svgImage;
   private SVGGraphics2D mockG2;
   private FontMetrics mockFontMetrics;
-  private Font font;
+  private FontGroup font;
 
   @BeforeEach
   public void setUp() {
@@ -33,7 +35,7 @@ public class SVGImageTest {
     svgImage = new SVGImage(mockG2, SCREEN_WIDTH, SCREEN_HEIGHT);
     mockFontMetrics = mock(FontMetrics.class);
     when(mockG2.getFontMetrics()).thenReturn(mockFontMetrics);
-    font = new Font(Font.SERIF, Font.BOLD, 10);
+    font = new FontGroup(new Font(Font.SERIF, Font.BOLD, 10));
   }
 
   @Test
@@ -98,11 +100,11 @@ public class SVGImageTest {
   }
 
   @Test
-  public void asSerial_success() throws Exception {
+  public void asSerial_bw_success() throws Exception {
     String svgContent =
         String.join("\n", Files.readAllLines(Paths.get("src/test/resources/svg/coffee.svg")));
     byte[] expectedBinaryContent =
-        Files.readAllBytes(Paths.get("src/test/resources/svg/coffee.bin"));
+        Files.readAllBytes(Paths.get("src/test/resources/svg/coffee_bw.bin"));
 
     doAnswer(
         i -> {
@@ -111,7 +113,26 @@ public class SVGImageTest {
         })
         .when(mockG2)
         .stream(any(StringWriter.class));
-    byte[] result = svgImage.asSerial();
+    byte[] result = svgImage.asSerial(RenderType.BW);
+
+    assertThat(result).isEqualTo(expectedBinaryContent);
+  }
+
+  @Test
+  public void asSerial_grayscale_success() throws Exception {
+    String svgContent =
+            String.join("\n", Files.readAllLines(Paths.get("src/test/resources/svg/coffee.svg")));
+    byte[] expectedBinaryContent =
+            Files.readAllBytes(Paths.get("src/test/resources/svg/coffee_grayscale.bin"));
+
+    doAnswer(
+            i -> {
+              i.getArgument(0, StringWriter.class).write(svgContent);
+              return null;
+            })
+            .when(mockG2)
+            .stream(any(StringWriter.class));
+    byte[] result = svgImage.asSerial(RenderType.GRAYSCALE);
 
     assertThat(result).isEqualTo(expectedBinaryContent);
   }

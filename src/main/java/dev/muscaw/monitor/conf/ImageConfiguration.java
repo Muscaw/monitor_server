@@ -1,5 +1,6 @@
 package dev.muscaw.monitor.conf;
 
+import dev.muscaw.monitor.image.ext.FontGroup;
 import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -9,9 +10,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ImageConfiguration {
   @Bean
-  public Font getImageFont() throws IOException, FontFormatException {
-    var font = Font.createFont(
-        Font.TRUETYPE_FONT, Paths.get("src/main/resources/font/basis33/basis33.ttf").toFile());
-    return font.deriveFont(Font.BOLD, 20);
+  public FontGroup getImageFont() throws IOException, FontFormatException {
+    var font =
+        Font.createFont(
+            Font.TRUETYPE_FONT, Paths.get("src/main/resources/font/pixeloid/PixeloidSans-mLxMm.ttf").toFile());
+    return new FontGroup(font);
   }
 }

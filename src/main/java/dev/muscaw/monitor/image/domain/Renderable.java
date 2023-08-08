@@ -5,5 +5,5 @@ public interface Renderable {
 
   byte[] getPNGImage();
 
-  byte[] asSerial();
+  byte[] asSerial(RenderType renderType);
 }
