@@ -41,17 +41,4 @@ public class FontGroupTest {
     verifyNoMoreInteractions(mockGe);
     assertThat(generatedFont).isEqualTo(generatedFont2);
   }
-
-  @Test
-  public void generateFont_alreadyExistsGlobally() {
-    var generatedFont = fontGroup.generateFont(Font.PLAIN, 10);
-    var newFontGroup = new FontGroup(base, mockGe);
-    var generatedFont2 = newFontGroup.generateFont(Font.PLAIN, 10);
-
-    assertThat(generatedFont).extracting(Font::getSize).isEqualTo(10);
-    assertThat(generatedFont).extracting(Font::getStyle).isEqualTo(Font.PLAIN);
-    verify(mockGe, times(1)).registerFont(generatedFont);
-    verifyNoMoreInteractions(mockGe);
-    assertThat(generatedFont).isEqualTo(generatedFont2);
-  }
 }

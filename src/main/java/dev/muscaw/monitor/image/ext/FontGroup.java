@@ -4,22 +4,25 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public record FontGroup(Font base, GraphicsEnvironment ge) {
-  record FontStyle(int style, float size) {}
+public class FontGroup {
+  private Font base;
+  private GraphicsEnvironment ge;
+  private final Map<FontStyle, Font> fonts = new HashMap<>();
 
-  private static final Map<FontStyle, Font> fonts = new HashMap<>();
+  public FontGroup(Font base, GraphicsEnvironment ge) {
+      this.base = base;
+      this.ge = ge;
+  }
+
+  record FontStyle(int style, float size) {}
 
   public Font generateFont(int style, float size) {
     return fonts.computeIfAbsent(
         new FontStyle(style, size),
         (fs) -> {
           var f = base.deriveFont(fs.style(), fs.size());
-          this.registerFont(f);
+          ge.registerFont(f);
           return f;
         });
-  }
-
-  private void registerFont(Font font) {
-    ge.registerFont(font);
   }
 }
