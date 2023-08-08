@@ -9,6 +9,7 @@ import dev.muscaw.monitor.util.domain.LatLon;
 import dev.muscaw.monitor.weather.domain.WeatherService;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,16 +20,21 @@ public class MonitorAppServiceImpl implements AppService {
   private final WeatherService weatherService;
   private final ImageGeneratorService imageGeneratorService;
 
+  private final LatLon weatherLocation;
+
   @Autowired
   public MonitorAppServiceImpl(
-      WeatherService weatherService, ImageGeneratorService imageGeneratorService) {
+      WeatherService weatherService,
+      ImageGeneratorService imageGeneratorService,
+      @Qualifier("weatherLocation") LatLon weatherLocation) {
     this.weatherService = weatherService;
     this.imageGeneratorService = imageGeneratorService;
+    this.weatherLocation = weatherLocation;
   }
 
   @Override
   public Optional<Page> getPage(int pageNumber, DeviceConfiguration deviceConfiguration) {
-    var weather = weatherService.getCurrentWeather(new LatLon(46.62f, 7.07f));
+    var weather = weatherService.getCurrentWeather(weatherLocation);
     return Optional.of(
         new Page(
             pageNumber,
@@ -42,10 +48,6 @@ public class MonitorAppServiceImpl implements AppService {
   }
 
   private int nextPage(int currentPage) {
-    currentPage += 1;
-    if (currentPage >= 5) {
-      currentPage = 0;
-    }
-    return currentPage;
+    return 0;
   }
 }
