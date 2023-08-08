@@ -11,33 +11,34 @@ public class WeatherSVGImage implements Renderable {
   public static final int MARGIN_PX = 5;
   private final SVGImage image;
 
-  WeatherSVGImage(SVGImage image, Weather weather, DeviceConfiguration deviceConfig) {
+  WeatherSVGImage(SVGImage image, Weather weather) {
     this.image = image;
 
     image.drawStringAt(MARGIN_PX, MARGIN_PX, "METEO " + weather.locationName());
-    image.drawStringLines(
+    image.drawStringTable(
         MARGIN_PX,
         MARGIN_PX + image.getStringHeight(),
         List.of(
-            "\tC°: " + weather.temperature().temperatureC(),
-            "\tRH: " + weather.humidity().percentage(),
-            "\tUV: " + weather.uvLevel().uvLevel(),
-            "\tWind: "
-                + weather.wind().windKph()
-                + "kph (gust "
-                + weather.wind().gustKph()
-                + " kph) dir: "
-                + weather.wind().direction().direction()
-                + "("
-                + weather.wind().direction().rotation()
-                + ")"));
-    image.drawRect(0, 0, deviceConfig.width() - 1, deviceConfig.height() - 1);
+            List.of(
+                "C°: " + weather.temperature().temperatureC(),
+                "RH: " + weather.humidity().percentage() + "%",
+                "UV: " + weather.uvLevel().uvLevel()),
+            List.of(
+                "Wind: " + weather.wind().windKph() + " kph",
+                "\tgust " + weather.wind().gustKph() + " kph",
+                "\tdir "
+                    + weather.wind().direction().direction()
+                    + "("
+                    + weather.wind().direction().rotation()
+                    + "°)",
+                "Rain: " + weather.precipitation().millimeters() + " mm")),
+        100);
   }
 
   public static WeatherSVGImage newImage(
       DeviceConfiguration deviceConfig, Weather weather, FontGroup font) {
     SVGImage image = SVGImage.newImage(deviceConfig.width(), deviceConfig.height(), font);
-    return new WeatherSVGImage(image, weather, deviceConfig);
+    return new WeatherSVGImage(image, weather);
   }
 
   @Override

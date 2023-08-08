@@ -80,6 +80,21 @@ public final class SVGImage implements Renderable {
     }
   }
 
+  public void drawStringTable(int x, int y, List<List<String>> table, int step) {
+    int currentX = x;
+    for (List<String> column : table) {
+      drawStringLines(currentX, y, column);
+      currentX += step;
+    }
+  }
+
+  public void drawStringTable(int x, int y, List<List<String>> table) {
+    int numberOfColumns = table.size();
+    int remainingSpace = width - x;
+    int step = remainingSpace / numberOfColumns;
+    drawStringTable(x, y, table, step);
+  }
+
   public void drawRect(int x, int y, int width, int height) {
     setDarkColor();
     g2.drawRect(x, y, width, height);
@@ -95,7 +110,7 @@ public final class SVGImage implements Renderable {
   }
 
   private int grayscaleToBlackWhite(int grayscale) {
-    // Returns black if color is less than the middle of the color space (tends to black).
+    // Returns black if color is less than specified brightness (tends to black).
     // Otherwise return white
     return (grayscale & 0xFF) < BRIGHTNESS_CUTOFF_LEVEL ? 0 : 0xFF;
   }
