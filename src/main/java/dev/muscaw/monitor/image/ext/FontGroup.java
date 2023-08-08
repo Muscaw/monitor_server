@@ -10,8 +10,8 @@ public class FontGroup {
   private final Map<FontStyle, Font> fonts = new HashMap<>();
 
   public FontGroup(Font base, GraphicsEnvironment ge) {
-      this.base = base;
-      this.ge = ge;
+    this.base = base;
+    this.ge = ge;
   }
 
   record FontStyle(int style, float size) {}
