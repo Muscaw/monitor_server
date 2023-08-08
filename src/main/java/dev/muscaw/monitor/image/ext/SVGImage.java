@@ -88,13 +88,6 @@ public final class SVGImage implements Renderable {
     }
   }
 
-  public void drawStringTable(int x, int y, List<List<String>> table) {
-    int numberOfColumns = table.size();
-    int remainingSpace = width - x;
-    int step = remainingSpace / numberOfColumns;
-    drawStringTable(x, y, table, step);
-  }
-
   public void drawRect(int x, int y, int width, int height) {
     setDarkColor();
     g2.drawRect(x, y, width, height);
