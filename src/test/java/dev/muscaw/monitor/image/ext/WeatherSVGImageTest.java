@@ -1,5 +1,7 @@
 package dev.muscaw.monitor.image.ext;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import dev.muscaw.monitor.image.domain.DeviceConfiguration;
 import dev.muscaw.monitor.util.domain.LatLon;
 import dev.muscaw.monitor.weather.domain.*;
@@ -9,8 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class WeatherSVGImageTest {
   private DeviceConfiguration configuration;
