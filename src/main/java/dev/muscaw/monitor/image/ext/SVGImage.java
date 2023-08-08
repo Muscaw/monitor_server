@@ -71,7 +71,7 @@ public final class SVGImage implements Renderable {
     g2.drawString(value, x, y + (height / 2));
   }
 
-  public void drawLines(int x, int y, List<String> lines) {
+  public void drawStringLines(int x, int y, List<String> lines) {
     int height = getStringHeight();
     int currentY = y;
     for (String line : lines) {

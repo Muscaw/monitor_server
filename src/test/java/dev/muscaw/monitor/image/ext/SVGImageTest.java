@@ -85,7 +85,7 @@ public class SVGImageTest {
   public void drawLines_success() {
     when(mockFontMetrics.getHeight()).thenReturn(10);
 
-    svgImage.drawLines(0, 0, List.of("string1", "string2", "string3"));
+    svgImage.drawStringLines(0, 0, List.of("string1", "string2", "string3"));
 
     verify(mockG2).drawString("string1", 0, 5);
     verify(mockG2).drawString("string2", 0, 15);

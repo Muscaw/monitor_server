@@ -4,7 +4,6 @@ import dev.muscaw.monitor.image.domain.DeviceConfiguration;
 import dev.muscaw.monitor.image.domain.RenderType;
 import dev.muscaw.monitor.image.domain.Renderable;
 import dev.muscaw.monitor.weather.domain.Weather;
-import java.awt.*;
 import java.util.List;
 
 public class WeatherSVGImage implements Renderable {
@@ -16,7 +15,7 @@ public class WeatherSVGImage implements Renderable {
     this.image = image;
 
     image.drawStringAt(MARGIN_PX, MARGIN_PX, "METEO " + weather.locationName());
-    image.drawLines(
+    image.drawStringLines(
         MARGIN_PX,
         MARGIN_PX + image.getStringHeight(),
         List.of(
