@@ -1,7 +1,6 @@
 package dev.muscaw.monitor.image.ext;
 
 import dev.muscaw.monitor.image.domain.ImageSerializationException;
-import dev.muscaw.monitor.image.domain.RenderType;
 import dev.muscaw.monitor.image.domain.Renderable;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -109,7 +108,7 @@ public final class SVGImage implements Renderable {
   }
 
   // Exporter functions
-  public byte[] asSerial(RenderType renderType) {
+  public byte[] asSerial() {
     byte[] pngImage = getPNGImage();
     BufferedImage image;
     try {
@@ -118,15 +117,15 @@ public final class SVGImage implements Renderable {
       // Not a recoverable error. Should not be thrown as everything happens in memory
       throw new RuntimeException(e);
     }
-    byte[] serializedImage = new byte[width * height];
+    byte[] serializedImage = new byte[(width * height) / 8];
     for (int y = 0; y < height; y++) {
-      for (int x = 0; x < width; x++) {
-        int color = image.getRGB(x, y);
-        int finalBrightness = colorToGrayscaleByte(color);
-        if (renderType == RenderType.BW) {
+      for (int x = 0; x < width / 8; x++) {
+        for (int b = 0; b < 8; b++) {
+          int color = image.getRGB(x * 8 + b, y);
+          int finalBrightness = colorToGrayscaleByte(color);
           finalBrightness = grayscaleToBlackWhite(finalBrightness);
+          serializedImage[(y * width / 8) + x] |= (byte) (finalBrightness > 0 ? 1 << 7 - b : 0);
         }
-        serializedImage[y * width + x] = (byte) finalBrightness;
       }
     }
     return serializedImage;

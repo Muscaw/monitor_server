@@ -1,7 +1,6 @@
 package dev.muscaw.monitor.image.ext;
 
 import dev.muscaw.monitor.image.domain.DeviceConfiguration;
-import dev.muscaw.monitor.image.domain.RenderType;
 import dev.muscaw.monitor.image.domain.Renderable;
 import dev.muscaw.monitor.weather.domain.Weather;
 import java.util.List;
@@ -52,7 +51,7 @@ public class WeatherSVGImage implements Renderable {
   }
 
   @Override
-  public byte[] asSerial(RenderType renderType) {
-    return image.asSerial(renderType);
+  public byte[] asSerial() {
+    return image.asSerial();
   }
 }
