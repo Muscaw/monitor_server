@@ -31,7 +31,7 @@ public class WeatherSVGImage implements Renderable {
                     + weather.wind().direction().rotation()
                     + "°)",
                 "Rain: " + weather.precipitation().millimeters() + " mm")),
-        100);
+        250);
   }
 
   public static WeatherSVGImage newImage(
@@ -51,7 +51,7 @@ public class WeatherSVGImage implements Renderable {
   }
 
   @Override
-  public byte[] asSerial() {
-    return image.asSerial();
+  public byte[] asBitmap() {
+    return image.asBitmap();
   }
 }

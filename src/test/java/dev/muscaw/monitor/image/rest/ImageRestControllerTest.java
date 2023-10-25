@@ -11,7 +11,6 @@ import dev.muscaw.monitor.app.domain.AppSelector;
 import dev.muscaw.monitor.app.domain.AppService;
 import dev.muscaw.monitor.app.domain.Page;
 import dev.muscaw.monitor.image.domain.DeviceConfiguration;
-import dev.muscaw.monitor.image.domain.RenderType;
 import dev.muscaw.monitor.image.domain.Renderable;
 import java.net.URI;
 import java.util.Optional;
@@ -68,7 +67,7 @@ public class ImageRestControllerTest {
     var mockAppService = mock(AppService.class);
     var mockRenderable = mock(Renderable.class);
 
-    when(mockRenderable.asSerial(RenderType.BW)).thenReturn(new byte[] {0, 1, 2, 3});
+    when(mockRenderable.asBitmap()).thenReturn(new byte[] {0, 1, 2, 3});
     when(mockAppService.getPage(0, new DeviceConfiguration(150, 100)))
         .thenReturn(Optional.of(new Page(0, 1, mockRenderable)));
 
@@ -126,7 +125,6 @@ public class ImageRestControllerTest {
   @Test
   public void getImage_pageNotFound() throws Exception {
     var mockAppService = mock(AppService.class);
-    var mockRenderable = mock(Renderable.class);
 
     when(mockAppService.getPage(0, new DeviceConfiguration(150, 100))).thenReturn(Optional.empty());
 

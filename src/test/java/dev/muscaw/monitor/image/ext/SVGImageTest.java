@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import dev.muscaw.monitor.image.domain.ImageSerializationException;
-import dev.muscaw.monitor.image.domain.RenderType;
 import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
@@ -114,26 +113,7 @@ public class SVGImageTest {
         })
         .when(mockG2)
         .stream(any(StringWriter.class));
-    byte[] result = svgImage.asSerial(RenderType.BW);
-
-    assertThat(result).isEqualTo(expectedBinaryContent);
-  }
-
-  @Test
-  public void asSerial_grayscale_success() throws Exception {
-    String svgContent =
-        String.join("\n", Files.readAllLines(Paths.get("src/test/resources/svg/coffee.svg")));
-    byte[] expectedBinaryContent =
-        Files.readAllBytes(Paths.get("src/test/resources/svg/coffee_grayscale.bin"));
-
-    doAnswer(
-        i -> {
-          i.getArgument(0, StringWriter.class).write(svgContent);
-          return null;
-        })
-        .when(mockG2)
-        .stream(any(StringWriter.class));
-    byte[] result = svgImage.asSerial(RenderType.GRAYSCALE);
+    byte[] result = svgImage.asBitmap();
 
     assertThat(result).isEqualTo(expectedBinaryContent);
   }

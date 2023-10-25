@@ -59,7 +59,7 @@ public class ImageRestController {
           .body(new ByteArrayResource(image.getPNGImage()));
       default -> responseBuilder
           .header("Content-Type", "application/octet-stream")
-          .body(new ByteArrayResource(image.asSerial()));
+          .body(new ByteArrayResource(image.asBitmap()));
     };
   }
 

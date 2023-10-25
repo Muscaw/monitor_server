@@ -38,7 +38,7 @@ public final class SVGImage implements Renderable {
     SVGGraphics2D g2 = new SVGGraphics2D(document);
     g2.setColor(Color.BLACK);
     g2.setSVGCanvasSize(new Dimension(width, height));
-    g2.setFont(font.generateFont(Font.PLAIN, 20));
+    g2.setFont(font.generateFont(Font.PLAIN, 50));
     g2.setRenderingHint(
         RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
     return new SVGImage(g2, width, height);
@@ -108,7 +108,7 @@ public final class SVGImage implements Renderable {
   }
 
   // Exporter functions
-  public byte[] asSerial() {
+  public byte[] asBitmap() {
     byte[] pngImage = getPNGImage();
     BufferedImage image;
     try {
