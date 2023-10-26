@@ -5,6 +5,7 @@ import dev.muscaw.monitor.image.domain.Renderable;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.file.Path;
 import java.util.List;
 import javax.imageio.ImageIO;
 import org.apache.batik.anim.dom.SVGDOMImplementation;
@@ -32,13 +33,18 @@ public final class SVGImage implements Renderable {
     this.height = height;
   }
 
+  private static int deviceSizeToFontSize(int width, int height) {
+    int interestingDimension = Math.min(width, height); // We only take the smaller side
+    return interestingDimension / 10; // Arbitrary factor that looks good
+  }
+
   public static SVGImage newImage(int width, int height, FontGroup font) {
     DOMImplementation domImplementation = SVGDOMImplementation.getDOMImplementation();
     Document document = domImplementation.createDocument(SVG_NS, "svg", null);
     SVGGraphics2D g2 = new SVGGraphics2D(document);
     g2.setColor(Color.BLACK);
     g2.setSVGCanvasSize(new Dimension(width, height));
-    g2.setFont(font.generateFont(Font.PLAIN, 50));
+    g2.setFont(font.generateFont(Font.PLAIN, deviceSizeToFontSize(width, height)));
     g2.setRenderingHint(
         RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
     return new SVGImage(g2, width, height);
@@ -60,6 +66,10 @@ public final class SVGImage implements Renderable {
 
   public int getImageWidth() {
     return this.width;
+  }
+
+  public int getImageHeight() {
+    return this.height;
   }
 
   public void drawStringCentered(int x, int y, String value) {
@@ -95,6 +105,16 @@ public final class SVGImage implements Renderable {
   public void drawRect(int x, int y, int width, int height) {
     setDarkColor();
     g2.drawRect(x, y, width, height);
+  }
+
+  public void drawImage(Path path, int x, int y, int width, int height) {
+
+    try {
+      BufferedImage image = ImageIO.read(path.toFile());
+      g2.drawImage(image, x, y, width, height, null);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private int colorToGrayscaleByte(int color) {

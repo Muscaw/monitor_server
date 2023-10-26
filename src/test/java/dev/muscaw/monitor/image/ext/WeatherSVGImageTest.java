@@ -15,11 +15,13 @@ import org.junit.jupiter.api.Test;
 public class WeatherSVGImageTest {
   private DeviceConfiguration configuration;
   private Weather weather;
+  private WeatherIconLoader weatherIconLoader;
   private FontGroup fontGroup;
 
   @BeforeEach
   public void setUp() throws IOException, FontFormatException {
     this.configuration = new DeviceConfiguration(296, 128);
+    weatherIconLoader = new WeatherIconLoader();
     this.weather =
         new Weather(
             "Home",
@@ -28,7 +30,8 @@ public class WeatherSVGImageTest {
             new RelativeHumidity(40),
             new UV(2),
             new Wind(10, 20.5f, new CardinalDirection("W", 270)),
-            new Precipitation(1));
+            new Precipitation(1),
+            WeatherDescription.SCATTERED_CLOUDS);
     var font =
         Font.createFont(
             Font.TRUETYPE_FONT,
@@ -41,7 +44,7 @@ public class WeatherSVGImageTest {
   public void newImage_generatesExpectedPng() throws IOException {
     byte[] expectedPngContent =
         Files.readAllBytes(Paths.get("src/test/resources/weather/weather.png"));
-    var image = WeatherSVGImage.newImage(configuration, weather, fontGroup);
+    var image = WeatherSVGImage.newImage(configuration, weatherIconLoader, weather, fontGroup);
 
     byte[] result = image.getPNGImage();
 

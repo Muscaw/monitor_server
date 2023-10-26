@@ -100,7 +100,7 @@ public class SVGImageTest {
   }
 
   @Test
-  public void asSerial_bw_success() throws Exception {
+  public void asBitmap_success() throws Exception {
     String svgContent =
         String.join("\n", Files.readAllLines(Paths.get("src/test/resources/svg/coffee.svg")));
     byte[] expectedBinaryContent =
