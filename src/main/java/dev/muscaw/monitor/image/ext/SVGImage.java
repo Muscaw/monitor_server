@@ -58,6 +58,10 @@ public final class SVGImage implements Renderable {
     return metrics.stringWidth(value);
   }
 
+  public int getImageWidth() {
+    return this.width;
+  }
+
   public void drawStringCentered(int x, int y, String value) {
     int width = getStringWidth(value);
 
@@ -79,8 +83,9 @@ public final class SVGImage implements Renderable {
     }
   }
 
-  public void drawStringTable(int x, int y, List<List<String>> table, int step) {
+  public void drawStringTable(int x, int y, int tableWidth, List<List<String>> table) {
     int currentX = x;
+    int step = tableWidth / table.size();
     for (List<String> column : table) {
       drawStringLines(currentX, y, column);
       currentX += step;

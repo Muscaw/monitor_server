@@ -7,7 +7,7 @@ import java.util.List;
 
 public class WeatherSVGImage implements Renderable {
 
-  public static final int MARGIN_PX = 5;
+  public static final int MARGIN_PX = 20;
   private final SVGImage image;
 
   WeatherSVGImage(SVGImage image, Weather weather) {
@@ -16,7 +16,8 @@ public class WeatherSVGImage implements Renderable {
     image.drawStringAt(MARGIN_PX, MARGIN_PX, "METEO " + weather.locationName());
     image.drawStringTable(
         MARGIN_PX,
-        MARGIN_PX + image.getStringHeight(),
+            (int) (MARGIN_PX + image.getStringHeight() * 1.5),
+        image.getImageWidth() - MARGIN_PX * 2,
         List.of(
             List.of(
                 "C°: " + weather.temperature().temperatureC(),
@@ -24,15 +25,15 @@ public class WeatherSVGImage implements Renderable {
                 "UV: " + weather.uvLevel().uvLevel()),
             List.of(
                 "Wind: " + weather.wind().windKph() + " kph",
-                "\tgust " + weather.wind().gustKph() + " kph",
-                "\tdir "
+                "\t\tgust " + weather.wind().gustKph() + " kph",
+                "\t\tdir "
                     + weather.wind().direction().direction()
                     + "("
                     + weather.wind().direction().rotation()
                     + "°)",
-                "Rain: " + weather.precipitation().millimeters() + " mm")),
-        250);
+                "Rain: " + weather.precipitation().millimeters() + " mm")));
   }
+
 
   public static WeatherSVGImage newImage(
       DeviceConfiguration deviceConfig, Weather weather, FontGroup font) {
