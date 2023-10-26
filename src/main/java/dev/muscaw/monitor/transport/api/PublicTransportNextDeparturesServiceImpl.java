@@ -1,13 +1,31 @@
 package dev.muscaw.monitor.transport.api;
 
+import dev.muscaw.monitor.transport.domain.Departure;
+import dev.muscaw.monitor.transport.domain.PublicTransportNextDeparturesService;
 import dev.muscaw.monitor.util.domain.LatLon;
 import dev.muscaw.monitor.util.domain.WallClock;
+import org.apache.batik.dom.util.DocumentFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
 import retrofit2.Retrofit;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.ByteArrayInputStream;
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Stream;
 
-public class PublicTransportNextDeparturesServiceImpl {
+public class PublicTransportNextDeparturesServiceImpl implements PublicTransportNextDeparturesService {
 
+    private record Stop(String name, String didok) {}
+
+    public static final int MAX_RETRIES = 3;
     private WallClock wallClock;
     private final String token;
     private final TriasDepartureEndpoint client;
@@ -51,5 +69,38 @@ public class PublicTransportNextDeparturesServiceImpl {
                 "        </RequestPayload>\n" +
                 "    </ServiceRequest>\n" +
                 "</Trias>";
+    }
+
+    @Override
+    public Departure getNextDepartureForLocation(LatLon location) {
+        return retryGetNextDepartureForLocation(location, MAX_RETRIES);
+    }
+
+    private Departure retryGetNextDepartureForLocation(LatLon location, int retriesLeft) {
+
+        CompletableFuture<String> result = client.getTriasResult(generateLocationInformationRequest(location));
+        try {
+            result.get();
+        } catch (InterruptedException | ExecutionException e) {
+            if (retriesLeft > 0) {
+                return retryGetNextDepartureForLocation(location, retriesLeft - 1);
+            } else {
+                // After we went through all retries, we throw
+                throw new RuntimeException(e);
+            }
+        }
+        return null;
+    }
+
+    private List<Stop> parseStops(String response) {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        ByteArrayInputStream bis = new ByteArrayInputStream(response.getBytes(StandardCharsets.UTF_8));
+        Document doc = builder.parse(bis);
+        Element root = doc.getDocumentElement();
+        var locationInformationResponse = root.getElementsByTagName("Location");
+        for(int i = 0; i < locationInformationResponse.getLength(); i++) {
+            var location = locationInformationResponse.item(i);
+        }
     }
 }
