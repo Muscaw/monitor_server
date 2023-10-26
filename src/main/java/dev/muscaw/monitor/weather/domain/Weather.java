@@ -9,4 +9,5 @@ public record Weather(
     RelativeHumidity humidity,
     UV uvLevel,
     Wind wind,
-    Precipitation precipitation) {}
+    Precipitation precipitation,
+    WeatherDescription weatherDescription) {}

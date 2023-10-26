@@ -31,6 +31,7 @@ public record WeatherApiWeather(Location location, CurrentWeather current) {
             current.wind_kph,
             current.gust_kph,
             new CardinalDirection(current.wind_dir, current.wind_degree)),
-        new Precipitation(current.precip_mm));
+        new Precipitation(current.precip_mm),
+        WeatherDescription.NOT_AVAILABLE);
   }
 }

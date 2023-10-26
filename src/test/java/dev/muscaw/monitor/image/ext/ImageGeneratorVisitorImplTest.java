@@ -15,12 +15,15 @@ import org.junit.jupiter.api.Test;
 public class ImageGeneratorVisitorImplTest {
 
   private ImageGeneratorVisitorImpl imageGeneratorVisitor;
+  private WeatherIconLoader weatherIconLoader;
 
   @BeforeEach
   public void setUp() {
     Font font = new Font(Font.SERIF, Font.PLAIN, 10);
     GraphicsEnvironment ge = mock(GraphicsEnvironment.class);
-    imageGeneratorVisitor = new ImageGeneratorVisitorImpl(new FontGroup(font, ge));
+    weatherIconLoader = new WeatherIconLoader();
+    imageGeneratorVisitor =
+        new ImageGeneratorVisitorImpl(new FontGroup(font, ge), weatherIconLoader);
   }
 
   @Test
@@ -34,7 +37,8 @@ public class ImageGeneratorVisitorImplTest {
             new RelativeHumidity(10),
             new UV(2),
             new Wind(20, 10, new CardinalDirection("NWN", 180)),
-            new Precipitation(0));
+            new Precipitation(0),
+            WeatherDescription.CLEAR_SKY);
     WeatherOption option = new WeatherOption(configuration, weather);
     Renderable output = imageGeneratorVisitor.renderWeather(option);
 

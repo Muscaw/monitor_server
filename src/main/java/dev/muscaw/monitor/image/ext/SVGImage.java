@@ -1,11 +1,11 @@
 package dev.muscaw.monitor.image.ext;
 
 import dev.muscaw.monitor.image.domain.ImageSerializationException;
-import dev.muscaw.monitor.image.domain.RenderType;
 import dev.muscaw.monitor.image.domain.Renderable;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.file.Path;
 import java.util.List;
 import javax.imageio.ImageIO;
 import org.apache.batik.anim.dom.SVGDOMImplementation;
@@ -33,13 +33,18 @@ public final class SVGImage implements Renderable {
     this.height = height;
   }
 
+  private static int deviceSizeToFontSize(int width, int height) {
+    int interestingDimension = Math.min(width, height); // We only take the smaller side
+    return interestingDimension / 10; // Arbitrary factor that looks good
+  }
+
   public static SVGImage newImage(int width, int height, FontGroup font) {
     DOMImplementation domImplementation = SVGDOMImplementation.getDOMImplementation();
     Document document = domImplementation.createDocument(SVG_NS, "svg", null);
     SVGGraphics2D g2 = new SVGGraphics2D(document);
     g2.setColor(Color.BLACK);
     g2.setSVGCanvasSize(new Dimension(width, height));
-    g2.setFont(font.generateFont(Font.PLAIN, 20));
+    g2.setFont(font.generateFont(Font.PLAIN, deviceSizeToFontSize(width, height)));
     g2.setRenderingHint(
         RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
     return new SVGImage(g2, width, height);
@@ -57,6 +62,14 @@ public final class SVGImage implements Renderable {
   public int getStringWidth(String value) {
     FontMetrics metrics = g2.getFontMetrics();
     return metrics.stringWidth(value);
+  }
+
+  public int getImageWidth() {
+    return this.width;
+  }
+
+  public int getImageHeight() {
+    return this.height;
   }
 
   public void drawStringCentered(int x, int y, String value) {
@@ -80,8 +93,9 @@ public final class SVGImage implements Renderable {
     }
   }
 
-  public void drawStringTable(int x, int y, List<List<String>> table, int step) {
+  public void drawStringTable(int x, int y, int tableWidth, List<List<String>> table) {
     int currentX = x;
+    int step = tableWidth / table.size();
     for (List<String> column : table) {
       drawStringLines(currentX, y, column);
       currentX += step;
@@ -91,6 +105,16 @@ public final class SVGImage implements Renderable {
   public void drawRect(int x, int y, int width, int height) {
     setDarkColor();
     g2.drawRect(x, y, width, height);
+  }
+
+  public void drawImage(Path path, int x, int y, int width, int height) {
+
+    try {
+      BufferedImage image = ImageIO.read(path.toFile());
+      g2.drawImage(image, x, y, width, height, null);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private int colorToGrayscaleByte(int color) {
@@ -109,7 +133,7 @@ public final class SVGImage implements Renderable {
   }
 
   // Exporter functions
-  public byte[] asSerial(RenderType renderType) {
+  public byte[] asBitmap() {
     byte[] pngImage = getPNGImage();
     BufferedImage image;
     try {
@@ -118,15 +142,15 @@ public final class SVGImage implements Renderable {
       // Not a recoverable error. Should not be thrown as everything happens in memory
       throw new RuntimeException(e);
     }
-    byte[] serializedImage = new byte[width * height];
+    byte[] serializedImage = new byte[(width * height) / 8];
     for (int y = 0; y < height; y++) {
-      for (int x = 0; x < width; x++) {
-        int color = image.getRGB(x, y);
-        int finalBrightness = colorToGrayscaleByte(color);
-        if (renderType == RenderType.BW) {
+      for (int x = 0; x < width / 8; x++) {
+        for (int b = 0; b < 8; b++) {
+          int color = image.getRGB(x * 8 + b, y);
+          int finalBrightness = colorToGrayscaleByte(color);
           finalBrightness = grayscaleToBlackWhite(finalBrightness);
+          serializedImage[(y * width / 8) + x] |= (byte) (finalBrightness > 0 ? 1 << 7 - b : 0);
         }
-        serializedImage[y * width + x] = (byte) finalBrightness;
       }
     }
     return serializedImage;

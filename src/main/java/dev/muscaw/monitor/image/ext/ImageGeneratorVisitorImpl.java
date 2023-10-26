@@ -10,14 +10,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class ImageGeneratorVisitorImpl implements ImageGeneratorVisitor {
   private final FontGroup imageFont;
+  private final WeatherIconLoader weatherIconLoader;
 
   @Autowired
-  public ImageGeneratorVisitorImpl(FontGroup imageFont) {
+  public ImageGeneratorVisitorImpl(FontGroup imageFont, WeatherIconLoader weatherIconLoader) {
     this.imageFont = imageFont;
+    this.weatherIconLoader = weatherIconLoader;
   }
 
   @Override
   public Renderable renderWeather(WeatherOption option) {
-    return WeatherSVGImage.newImage(option.configuration(), option.weather(), imageFont);
+    return WeatherSVGImage.newImage(
+        option.configuration(), weatherIconLoader, option.weather(), imageFont);
   }
 }
