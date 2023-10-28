@@ -42,6 +42,6 @@ public class ImageGeneratorVisitorImplTest {
     WeatherOption option = new WeatherOption(configuration, weather);
     Renderable output = imageGeneratorVisitor.renderWeather(option);
 
-    assertThat(output).isInstanceOf(WeatherSVGImage.class);
+    assertThat(output).isInstanceOf(WeatherImage.class);
   }
 }

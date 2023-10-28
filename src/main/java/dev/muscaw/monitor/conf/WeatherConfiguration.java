@@ -38,6 +38,6 @@ public class WeatherConfiguration {
     String latLon = env.getEnv("WEATHER_LAT_LON").orElseThrow();
     String[] values = latLon.split(",");
 
-    return new LatLon(Float.parseFloat(values[0]), Float.parseFloat(values[1]));
+    return new LatLon(Double.parseDouble(values[0]), Double.parseDouble(values[1]));
   }
 }

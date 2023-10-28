@@ -1,8 +1,9 @@
 package dev.muscaw.monitor.transport.domain;
 
 import dev.muscaw.monitor.util.domain.LatLon;
+import java.util.List;
 
 public interface PublicTransportNextDeparturesService {
 
-    Departure getNextDepartureForLocation(LatLon location);
+  List<Departure> getNextDepartureForLocation(LatLon location);
 }

@@ -5,16 +5,16 @@ import dev.muscaw.monitor.image.domain.Renderable;
 import dev.muscaw.monitor.weather.domain.Weather;
 import java.util.List;
 
-public class WeatherSVGImage implements Renderable {
+public class WeatherImage implements Renderable {
 
   public static final int MARGIN_PX = 20;
   private final SVGImage image;
 
-  WeatherSVGImage(SVGImage image, WeatherIconLoader iconLoader, Weather weather) {
+  WeatherImage(SVGImage image, WeatherIconLoader iconLoader, Weather weather) {
     this.image = image;
 
-    image.drawStringAt(MARGIN_PX, MARGIN_PX, "METEO " + weather.locationName());
-    image.drawStringTable(
+    this.image.drawStringAt(MARGIN_PX, MARGIN_PX, "METEO " + weather.locationName());
+    this.image.drawStringTable(
         MARGIN_PX,
         (int) (MARGIN_PX + image.getStringHeight() * 2),
         image.getImageWidth() - MARGIN_PX * 2,
@@ -53,13 +53,13 @@ public class WeatherSVGImage implements Renderable {
     }
   }
 
-  public static WeatherSVGImage newImage(
+  public static WeatherImage newImage(
       DeviceConfiguration deviceConfig,
       WeatherIconLoader iconLoader,
       Weather weather,
       FontGroup font) {
     SVGImage image = SVGImage.newImage(deviceConfig.width(), deviceConfig.height(), font);
-    return new WeatherSVGImage(image, iconLoader, weather);
+    return new WeatherImage(image, iconLoader, weather);
   }
 
   @Override

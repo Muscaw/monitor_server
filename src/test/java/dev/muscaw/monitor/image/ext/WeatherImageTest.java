@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class WeatherSVGImageTest {
+public class WeatherImageTest {
   private DeviceConfiguration configuration;
   private Weather weather;
   private WeatherIconLoader weatherIconLoader;
@@ -44,7 +44,7 @@ public class WeatherSVGImageTest {
   public void newImage_generatesExpectedPng() throws IOException {
     byte[] expectedPngContent =
         Files.readAllBytes(Paths.get("src/test/resources/weather/weather.png"));
-    var image = WeatherSVGImage.newImage(configuration, weatherIconLoader, weather, fontGroup);
+    var image = WeatherImage.newImage(configuration, weatherIconLoader, weather, fontGroup);
 
     byte[] result = image.getPNGImage();
 
