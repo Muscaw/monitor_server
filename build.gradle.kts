@@ -26,7 +26,7 @@ dependencies {
     implementation("org.apache.xmlgraphics:batik-svggen:1.16")
     implementation("org.apache.xmlgraphics:batik-dom:1.16")
     implementation("org.apache.xmlgraphics:batik-transcoder:1.16")
-    implementation("org.apache.xmlgraphics:batik-codec:1.16")
+    implementation("org.apache.xmlgraphics:batik-codec:1.17")
     // HTTP queries
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-jackson:2.9.0")
